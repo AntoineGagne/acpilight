@@ -106,6 +106,16 @@ def _make_controller(controller_name):
     return Controller(controllers[controller_name])
 
 
+def _display_brightness(arguments):
+    print(int(round(arguments.ctrl.brightness())))
+    sys.exit(0)
+
+
+def _display_fractional_brightness(arguments):
+    print(arguments.ctrl.brightness())
+    sys.exit(0)
+
+
 def main():
     controllers = tuple(get_controllers().values())
     ap = argparse.ArgumentParser(
@@ -113,17 +123,51 @@ def main():
         formatter_class=ArgumentDefaultsHelpFormatter
     )
     g = ap.add_mutually_exclusive_group(required=True)
-    g.add_argument("-list", action="store_const", dest='command', const=_display_controllers, help="List controllers")
-    g.add_argument("-getf", action="store_true",
-                   help="Get fractional brightness")
-    g.add_argument("-get", action="store_true", help="Get brightness")
-    g.add_argument("-set", metavar="PERCENT", type=float, help="Set brightness")
-    g.add_argument("-inc", metavar="PERCENT", type=float,
-                   help="Increase brightness")
-    g.add_argument("-dec", metavar="PERCENT", type=float,
-                   help="Decrease brightness")
-    g.add_argument("pc", metavar="PERCENT", type=pc, nargs='?',
-                   help="[=+-]PERCENT to set, increase, decrease brightness")
+    g.add_argument(
+        "-list",
+        action="store_const",
+        dest='command',
+        const=_display_controllers,
+        help="list controllers"
+    )
+    g.add_argument(
+        "-getf",
+        action="store_const",
+        dest='command',
+        const=_display_fractional_brightness,
+        help="get fractional brightness"
+    )
+    g.add_argument(
+        "-get",
+        action="store_const",
+        dest='command',
+        const=_display_brightness,
+        help="get brightness"
+    )
+    g.add_argument(
+        "-set",
+        metavar="PERCENT",
+        type=float,
+        help="Set brightness"
+    )
+    g.add_argument(
+        "-inc",
+        metavar="PERCENT",
+        type=float,
+        help="increase brightness"
+    )
+    g.add_argument(
+        "-dec",
+        metavar="PERCENT",
+        type=float,
+        help="decrease brightness"
+    )
+    g.add_argument(
+        "pc",
+        metavar="PERCENT",
+        type=pc,
+        nargs='?',
+        help="[=+-]PERCENT to set, increase, decrease brightness")
     ap.add_argument(
         "-ctrl",
         default=Controller(controllers[0]),
@@ -138,11 +182,22 @@ def main():
         help="fading period (in milliseconds)"
     )
     g = ap.add_mutually_exclusive_group()
-    g.add_argument("-steps", type=int,
-                   default=0, help="Fading steps (default: 0)")
-    g.add_argument("-fps", type=int,
-                   default=0, help="Fading frame rate (default: 0)")
-    ap.add_argument("-display", help="Ignored")
+    g.add_argument(
+        "-steps",
+        type=int,
+        default=0,
+        help="Fading steps (default: 0)"
+    )
+    g.add_argument(
+        "-fps",
+        type=int,
+        default=0,
+        help="Fading frame rate (default: 0)"
+    )
+    ap.add_argument(
+        "-display",
+        help="Ignored"
+    )
     args = ap.parse_args()
 
     if args.command is not None:
@@ -164,8 +219,6 @@ def main():
     # perform the requested action
     if args.getf:
         print(ctrl.brightness())
-    elif args.get:
-        print(int(round(ctrl.brightness())))
     else:
         current = ctrl.brightness()
         if args.set is not None:
