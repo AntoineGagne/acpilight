@@ -116,6 +116,41 @@ def _display_fractional_brightness(arguments):
     sys.exit(0)
 
 
+def _handle_other_actions(arguments):
+    if arguments.pc is not None:
+        v = float(arguments.pc[1:])
+        if arguments.pc[0] == '=':
+            arguments.set = v
+        elif arguments.pc[0] == '+':
+            arguments.inc = v
+        elif arguments.pc[0] == '-':
+            arguments.dec = v
+    if arguments.fps:
+        arguments.steps = int((arguments.fps / 1000) * arguments.time)
+
+    # perform the requested action
+    current = arguments.ctrl.brightness()
+    if arguments.set is not None:
+        target = arguments.set
+    elif arguments.inc is not None:
+        target = current + arguments.inc
+    elif arguments.dec is not None:
+        target = current - arguments.dec
+    target = normalize(target, 0, 100)
+    if current == target:
+        pass
+    elif arguments.steps <= 1 or arguments.time < 1:
+        arguments.ctrl.set_brightness(target)
+    else:
+        sweep_brightness(
+            arguments.ctrl,
+            current,
+            target,
+            arguments.steps,
+            arguments.time
+        )
+
+
 def main():
     controllers = tuple(get_controllers().values())
     ap = argparse.ArgumentParser(
@@ -198,40 +233,9 @@ def main():
         "-display",
         help="ignored"
     )
+    ap.set_defaults(command=_handle_other_actions)
     args = ap.parse_args()
-
-    if args.command is not None:
-        args.command(args)
-
-    # uniform set arguments
-    if args.pc is not None:
-        v = float(args.pc[1:])
-        if args.pc[0] == '=':
-            args.set = v
-        elif args.pc[0] == '+':
-            args.inc = v
-        elif args.pc[0] == '-':
-            args.dec = v
-    if args.fps:
-        args.steps = int((args.fps / 1000) * args.time)
-
-    # perform the requested action
-    current = args.ctrl.brightness()
-    if args.set is not None:
-        target = args.set
-    elif args.inc is not None:
-        target = current + args.inc
-    elif args.dec is not None:
-        target = current - args.dec
-    target = normalize(target, 0, 100)
-    if current == target:
-        pass
-    elif args.steps <= 1 or args.time < 1:
-        args.ctrl.set_brightness(target)
-    else:
-        sweep_brightness(args.ctrl, current, target, args.steps, args.time)
-
-    return 0
+    args.command(args)
 
 
 if __name__ == "__main__":
