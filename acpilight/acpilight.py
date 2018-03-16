@@ -5,11 +5,12 @@
 """
 
 import argparse
-from collections import OrderedDict
 import os
 import sys
 import time
 
+from argparse import ArgumentDefaultsHelpFormatter
+from collections import OrderedDict
 from typing import TypeVar
 
 APP_DESC = "control backlight brightness"
@@ -107,10 +108,11 @@ def _make_controller(controller_name):
 
 def main():
     controllers = tuple(get_controllers().values())
-    ap = argparse.ArgumentParser(description=APP_DESC, add_help=False)
+    ap = argparse.ArgumentParser(
+        description=APP_DESC,
+        formatter_class=ArgumentDefaultsHelpFormatter
+    )
     g = ap.add_mutually_exclusive_group(required=True)
-    g.add_argument("-h", "-help", action="help",
-                   help="Show this help and exit")
     g.add_argument("-list", action="store_const", dest='command', const=_display_controllers, help="List controllers")
     g.add_argument("-getf", action="store_true",
                    help="Get fractional brightness")
@@ -128,8 +130,13 @@ def main():
         type=_make_controller,
         help="set the controller to use"
     )
-    ap.add_argument("-time", metavar="MILLISECS", type=int,
-                    default=200, help="Fading period (in milliseconds, default: 200)")
+    ap.add_argument(
+        "-time",
+        metavar="MILLISECS",
+        type=int,
+        default=200,
+        help="fading period (in milliseconds)"
+    )
     g = ap.add_mutually_exclusive_group()
     g.add_argument("-steps", type=int,
                    default=0, help="Fading steps (default: 0)")
