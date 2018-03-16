@@ -1,14 +1,22 @@
+========================================================
 acpilight: a backward-compatibile xbacklight replacement
 ========================================================
 
-"acpilight" is a backward-compatibile replacement for xbacklight_ that uses the
+:Author:
+    `Yuri D'Elia <wavexx@thregr.org>`_
+
+.. contents::
+    :backlinks: none
+
+.. sectnum::
+
+``acpilight`` is a backward-compatibile replacement for xbacklight_ that uses the
 ACPI interface to set the display brightness. On modern laptops "acpilight" can
 control both display and keyboard backlight uniformly on either X11, the
 console or Wayland.
 
-
 Motivation
-----------
+==========
 
 On some modern laptops "XRandR" might lack the ability to set the display
 brightness. This capability was moved/unified to the kernel's ACPI interface,
@@ -22,9 +30,8 @@ Wayland (X11 is not used at all).
 When paired with the ddcci-backlight_ kernel module, the backlight of most
 professional external monitors can be controlled as well.
 
-
 Setup
------
+=====
 
 Normally, users are prohibited to alter files in the ``sys`` filesystem. It's
 advisable (and *recommended*) to setup an "udev" rule to allow users in the
@@ -66,11 +73,10 @@ backlight control can be enabled by installing the `appropriate drivers
 time. On Debian, this is done by installing the ``ddcci-dkms`` package
 and then appending ``ddcci-backlight`` to ``/etc/modules``.
 
-
 Differences from xbacklight
----------------------------
+===========================
 
-The original "xbacklight" sets the display brightness of the current
+The original ``xbacklight`` sets the display brightness of the current
 ``$DISPLAY``, whereas "acpilight" ignores ``$DISPLAY`` completely and sets the
 brightness of the first device found in ``/sys/class/backlight`` by default. On
 systems with multiple panels, they might differ.
@@ -78,7 +84,7 @@ systems with multiple panels, they might differ.
 Use ``xbacklight -list`` to see the full list of available devices that can be
 controlled; then use the ``-ctrl`` flag to control them individually.
 
-"acpilight" can always *query*, but might not necessarily be allowed to *set*
+``acpilight`` can always *query*, but might not necessarily be allowed to *set*
 the brightness of all listed devices depending on the current user and
 permissions. See the setup section above to set the permissions correctly.
 
@@ -86,12 +92,11 @@ permissions. See the setup section above to set the permissions correctly.
 default. For smooth transitions, specify the number of fading steps (using
 ``-steps``) or, more conveniently, the fading frame rate (``-fps``).
 
-
 Authors and Copyright
----------------------
+=====================
 
-| "acpilight" is distributed under GPLv3+ (see COPYING) WITHOUT ANY WARRANTY.
-| Copyright(c) 2016-2017 by wave++ "Yuri D'Elia" <wavexx@thregr.org>.
+| ``acpilight`` is distributed under GPLv3+ (see `LICENSE.txt <LICENSE.txt>`_) WITHOUT ANY WARRANTY.
+| Copyright(c) 2016-2017 by wave++ `Yuri D'Elia <wavexx@thregr.org>`_.
 
 .. _xbacklight: http://cgit.freedesktop.org/xorg/app/xbacklight
 .. _ddcci-backlight: https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux
