@@ -13,8 +13,7 @@ from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
 from typing import TypeVar
 
-APP_DESC = "control backlight brightness"
-SYS_PATH = ["/sys/class/backlight", "/sys/class/leds"]
+CONTROLLERS_PATH = ["/sys/class/backlight", "/sys/class/leds"]
 
 T = TypeVar('T')
 
@@ -25,7 +24,7 @@ def error(msg):
 
 def get_controllers():
     ctrls = OrderedDict()
-    for path in SYS_PATH:
+    for path in CONTROLLERS_PATH:
         for name in os.listdir(path):
             ctrls[name] = os.path.join(path, name)
     return ctrls
@@ -151,7 +150,7 @@ def _handle_other_actions(arguments):
 def main():
     controllers = tuple(get_controllers().values())
     parser = argparse.ArgumentParser(
-        description=APP_DESC,
+        description='Control backlight brightness',
         formatter_class=ArgumentDefaultsHelpFormatter
     )
     group = parser.add_mutually_exclusive_group(required=True)
@@ -180,7 +179,7 @@ def main():
         "-set",
         metavar="PERCENT",
         type=float,
-        help="Set brightness"
+        help="set brightness"
     )
     group.add_argument(
         "-inc",
