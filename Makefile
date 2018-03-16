@@ -1,4 +1,4 @@
-MAIN_PACKAGE := statnot
+MAIN_PACKAGE := acpilight
 
 .PHONY: all
 all: build
