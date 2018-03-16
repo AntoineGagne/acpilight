@@ -95,16 +95,14 @@ def _display_controllers(arguments):
     sys.exit(0)
 
 
-def _make_controller():
+def _make_controller(controller_name):
     controllers = get_controllers()
 
-    def _wrapper(controller_name):
-        if controller_name not in controllers.values():
-            error("unknown controller '{}'".format(controller_name))
-            sys.exit(1)
-        return Controller(controllers[controller_name])
+    if controller_name not in controllers.values():
+        error("unknown controller '{}'".format(controller_name))
+        sys.exit(1)
 
-    return _wrapper
+    return Controller(controllers[controller_name])
 
 
 def main():
@@ -127,7 +125,7 @@ def main():
     ap.add_argument(
         "-ctrl",
         default=Controller(controllers[0]),
-        type=_make_controller(),
+        type=_make_controller,
         help="set the controller to use"
     )
     ap.add_argument("-time", metavar="MILLISECS", type=int,
