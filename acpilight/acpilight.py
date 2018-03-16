@@ -93,7 +93,6 @@ def _display_controllers(arguments):
     controllers = get_controllers()
     for controller in controllers:
         print(controller)
-    sys.exit(0)
 
 
 def _make_controller(controller_name):
@@ -108,12 +107,10 @@ def _make_controller(controller_name):
 
 def _display_brightness(arguments):
     print(int(round(arguments.ctrl.brightness())))
-    sys.exit(0)
 
 
 def _display_fractional_brightness(arguments):
     print(arguments.ctrl.brightness())
-    sys.exit(0)
 
 
 def _handle_other_actions(arguments):
