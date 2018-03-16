@@ -88,17 +88,23 @@ def pc(arg):
     return arg
 
 
+def _display_controllers(arguments):
+    controllers = get_controllers()
+    for controller in controllers:
+        print(controller)
+    sys.exit(0)
+
+
 def main():
     ap = argparse.ArgumentParser(description=APP_DESC, add_help=False)
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("-h", "-help", action="help",
                    help="Show this help and exit")
-    g.add_argument("-list", action="store_true", help="List controllers")
+    g.add_argument("-list", action="store_const", dest='command', const=_display_controllers, help="List controllers")
     g.add_argument("-getf", action="store_true",
                    help="Get fractional brightness")
     g.add_argument("-get", action="store_true", help="Get brightness")
-    g.add_argument("-set", metavar="PERCENT",
-                   type=float, help="Set brightness")
+    g.add_argument("-set", metavar="PERCENT", type=float, help="Set brightness")
     g.add_argument("-inc", metavar="PERCENT", type=float,
                    help="Increase brightness")
     g.add_argument("-dec", metavar="PERCENT", type=float,
@@ -116,12 +122,9 @@ def main():
     ap.add_argument("-display", help="Ignored")
     args = ap.parse_args()
 
-    # list controllers
+    if args.command is not None:
+        args.command(args)
     ctrls = get_controllers()
-    if args.list:
-        for name in ctrls:
-            print(name)
-        return 0
 
     # set current operating controller
     if args.ctrl is None:
