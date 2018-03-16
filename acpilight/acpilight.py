@@ -4,14 +4,18 @@
    :copyright: (c) 2016-2017 by wave++ `Yuri D'Elia <wavexx@thregr.org>`_
 """
 
-APP_DESC = "control backlight brightness"
-SYS_PATH = ["/sys/class/backlight", "/sys/class/leds"]
-
 import argparse
 from collections import OrderedDict
 import os
 import sys
 import time
+
+from typing import TypeVar
+
+APP_DESC = "control backlight brightness"
+SYS_PATH = ["/sys/class/backlight", "/sys/class/leds"]
+
+T = TypeVar('T')
 
 
 def error(msg):
@@ -26,8 +30,22 @@ def get_controllers():
     return ctrls
 
 
-def clamp(v, vmin, vmax):
-    return max(min(v, vmax), vmin)
+def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
+    """Normalize a value so that it doesn't exceed a given range. Supports all
+       ordered types.
+
+    :param value: The value to normalize
+    :param minimum_value: The minimum value that ``value`` can take
+    :param maximum_value: The maximum value that ``value`` can take
+    :returns: If the value is between the minimum and maximum value, then
+              returns the value. Otherwise, returns one of the bounds.
+
+    :Example:
+
+    >>> normalize(-5, 0, 100)
+    0
+    """
+    return max(min(value, maximum_value), minimum_value)
 
 
 class Controller(object):
@@ -124,7 +142,7 @@ def main():
         elif args.pc[0] == '-':
             args.dec = v
     if args.fps:
-        args.steps = int((args.fps/1000) * args.time)
+        args.steps = int((args.fps / 1000) * args.time)
 
     # perform the requested action
     if args.getf:
@@ -139,7 +157,7 @@ def main():
             target = current + args.inc
         elif args.dec is not None:
             target = current - args.dec
-        target = clamp(target, 0, 100)
+        target = normalize(target, 0, 100)
         if current == target:
             pass
         elif args.steps <= 1 or args.time < 1:

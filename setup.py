@@ -12,6 +12,7 @@ LINTERS_REQUIRE = [
 ]
 
 TESTS_REQUIRE = [
+    'hypothesis>=3.49.1',
     'pytest-runner>=3.0',
     'pytest>=3.3.2',
     'coverage>=4.4.2'
@@ -33,7 +34,7 @@ if __name__ == '__main__':
     setup(
         name='acpilight',
         version='1.0.1',
-        description='A backward compatible `xbacklight` replacement.',
+        description='A backward compatible ``xbacklight`` replacement.',
         author='Yuri D\'Elia',
         author_email='wavexx@thregr.org',
         url='https://github.com/wavexx/acpilight',
@@ -48,7 +49,8 @@ if __name__ == '__main__':
         ),
         entry_points={
             'console_scripts': [
-                'xbacklight = acpilight.acpilight:main'
+                'xbacklight = acpilight.acpilight:main',
+                'acpilight = acpilight.acpilight:main'
             ]
         },
         data_files=[],
