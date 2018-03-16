@@ -1,21 +1,22 @@
-#!/usr/bin/env python
-# xbacklight: control backlight and led brightness on linux using the sys
-#             filesystem with a backward-compatibile user interface
-# Copyright(c) 2016-2017 by wave++ "Yuri D'Elia" <wavexx@thregr.org>
-# -*- coding: utf-8 -*-
-from __future__ import print_function, division, generators
+"""Control backlight and LED brightness on Linux using the ``sys`` filesystem
+   with a backward-compatibile user interface.
+
+   :copyright: (c) 2016-2017 by wave++ `Yuri D'Elia <wavexx@thregr.org>`_
+"""
 
 APP_DESC = "control backlight brightness"
 SYS_PATH = ["/sys/class/backlight", "/sys/class/leds"]
 
 import argparse
 from collections import OrderedDict
-import os, sys
+import os
+import sys
 import time
 
 
 def error(msg):
     print(sys.argv[0] + ": " + msg)
+
 
 def get_controllers():
     ctrls = OrderedDict()
@@ -24,6 +25,7 @@ def get_controllers():
             ctrls[name] = os.path.join(path, name)
     return ctrls
 
+
 def clamp(v, vmin, vmax):
     return max(min(v, vmax), vmin)
 
@@ -31,7 +33,8 @@ def clamp(v, vmin, vmax):
 class Controller(object):
     def __init__(self, path):
         self._brightness_path = os.path.join(path, "brightness")
-        self._max_brightness = int(open(os.path.join(path, "max_brightness")).read())
+        self._max_brightness = int(
+            open(os.path.join(path, "max_brightness")).read())
 
     def raw_brightness(self):
         return int(open(self._brightness_path).read())
@@ -70,13 +73,18 @@ def pc(arg):
 def main():
     ap = argparse.ArgumentParser(description=APP_DESC, add_help=False)
     g = ap.add_mutually_exclusive_group(required=True)
-    g.add_argument("-h", "-help", action="help", help="Show this help and exit")
+    g.add_argument("-h", "-help", action="help",
+                   help="Show this help and exit")
     g.add_argument("-list", action="store_true", help="List controllers")
-    g.add_argument("-getf", action="store_true", help="Get fractional brightness")
+    g.add_argument("-getf", action="store_true",
+                   help="Get fractional brightness")
     g.add_argument("-get", action="store_true", help="Get brightness")
-    g.add_argument("-set", metavar="PERCENT", type=float, help="Set brightness")
-    g.add_argument("-inc", metavar="PERCENT", type=float, help="Increase brightness")
-    g.add_argument("-dec", metavar="PERCENT", type=float, help="Decrease brightness")
+    g.add_argument("-set", metavar="PERCENT",
+                   type=float, help="Set brightness")
+    g.add_argument("-inc", metavar="PERCENT", type=float,
+                   help="Increase brightness")
+    g.add_argument("-dec", metavar="PERCENT", type=float,
+                   help="Decrease brightness")
     g.add_argument("pc", metavar="PERCENT", type=pc, nargs='?',
                    help="[=+-]PERCENT to set, increase, decrease brightness")
     ap.add_argument("-ctrl", help="Set controller to use")
@@ -84,9 +92,9 @@ def main():
                     default=200, help="Fading period (in milliseconds, default: 200)")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("-steps", type=int,
-                    default=0, help="Fading steps (default: 0)")
+                   default=0, help="Fading steps (default: 0)")
     g.add_argument("-fps", type=int,
-                    default=0, help="Fading frame rate (default: 0)")
+                   default=0, help="Fading frame rate (default: 0)")
     ap.add_argument("-display", help="Ignored")
     args = ap.parse_args()
 
