@@ -150,94 +150,86 @@ def _handle_other_actions(arguments):
 
 def main():
     controllers = tuple(get_controllers().values())
-    ap = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         description=APP_DESC,
         formatter_class=ArgumentDefaultsHelpFormatter
     )
-    g = ap.add_mutually_exclusive_group(required=True)
-    g.add_argument(
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         "-list",
         action="store_const",
         dest='command',
         const=_display_controllers,
         help="list controllers"
     )
-    g.add_argument(
+    group.add_argument(
         "-getf",
         action="store_const",
         dest='command',
         const=_display_fractional_brightness,
         help="get fractional brightness"
     )
-    g.add_argument(
+    group.add_argument(
         "-get",
         action="store_const",
         dest='command',
         const=_display_brightness,
         help="get brightness"
     )
-    g.add_argument(
+    group.add_argument(
         "-set",
         metavar="PERCENT",
         type=float,
         help="Set brightness"
     )
-    g.add_argument(
+    group.add_argument(
         "-inc",
         metavar="PERCENT",
         type=float,
         help="increase brightness"
     )
-    g.add_argument(
+    group.add_argument(
         "-dec",
         metavar="PERCENT",
         type=float,
         help="decrease brightness"
     )
-    g.add_argument(
+    group.add_argument(
         "pc",
         metavar="PERCENT",
         type=pc,
         nargs='?',
         help="[=+-]PERCENT to set, increase, decrease brightness")
-    ap.add_argument(
+    parser.add_argument(
         "-ctrl",
         default=Controller(controllers[0]),
         type=_make_controller,
         help="set the controller to use"
     )
-    ap.add_argument(
+    parser.add_argument(
         "-time",
         metavar="MILLISECS",
         type=int,
         default=200,
         help="fading period (in milliseconds)"
     )
-    g = ap.add_mutually_exclusive_group()
-    g.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "-steps",
         type=int,
         default=0,
         help="fading steps"
     )
-    g.add_argument(
+    group.add_argument(
         "-fps",
         type=int,
         default=0,
         help="fading frame rate"
     )
-    ap.add_argument(
+    parser.add_argument(
         "-display",
         help="ignored"
     )
-    ap.set_defaults(command=_handle_other_actions)
-    args = ap.parse_args()
-    args.command(args)
-
-
-if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except IOError as e:
-        error(str(e))
-        sys.exit(1)
+    parser.set_defaults(command=_handle_other_actions)
+    arguments = parser.parse_args()
+    arguments.command(arguments)
