@@ -202,7 +202,6 @@ def main():
 
     if args.command is not None:
         args.command(args)
-    ctrl = args.ctrl
 
     # uniform set arguments
     if args.pc is not None:
@@ -217,7 +216,7 @@ def main():
         args.steps = int((args.fps / 1000) * args.time)
 
     # perform the requested action
-    current = ctrl.brightness()
+    current = args.ctrl.brightness()
     if args.set is not None:
         target = args.set
     elif args.inc is not None:
@@ -228,9 +227,9 @@ def main():
     if current == target:
         pass
     elif args.steps <= 1 or args.time < 1:
-        ctrl.set_brightness(target)
+        args.ctrl.set_brightness(target)
     else:
-        sweep_brightness(ctrl, current, target, args.steps, args.time)
+        sweep_brightness(args.ctrl, current, target, args.steps, args.time)
 
     return 0
 
