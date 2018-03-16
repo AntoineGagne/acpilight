@@ -217,23 +217,20 @@ def main():
         args.steps = int((args.fps / 1000) * args.time)
 
     # perform the requested action
-    if args.getf:
-        print(ctrl.brightness())
+    current = ctrl.brightness()
+    if args.set is not None:
+        target = args.set
+    elif args.inc is not None:
+        target = current + args.inc
+    elif args.dec is not None:
+        target = current - args.dec
+    target = normalize(target, 0, 100)
+    if current == target:
+        pass
+    elif args.steps <= 1 or args.time < 1:
+        ctrl.set_brightness(target)
     else:
-        current = ctrl.brightness()
-        if args.set is not None:
-            target = args.set
-        elif args.inc is not None:
-            target = current + args.inc
-        elif args.dec is not None:
-            target = current - args.dec
-        target = normalize(target, 0, 100)
-        if current == target:
-            pass
-        elif args.steps <= 1 or args.time < 1:
-            ctrl.set_brightness(target)
-        else:
-            sweep_brightness(ctrl, current, target, args.steps, args.time)
+        sweep_brightness(ctrl, current, target, args.steps, args.time)
 
     return 0
 
