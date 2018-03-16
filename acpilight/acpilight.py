@@ -186,17 +186,17 @@ def main():
         "-steps",
         type=int,
         default=0,
-        help="Fading steps (default: 0)"
+        help="fading steps"
     )
     g.add_argument(
         "-fps",
         type=int,
         default=0,
-        help="Fading frame rate (default: 0)"
+        help="fading frame rate"
     )
     ap.add_argument(
         "-display",
-        help="Ignored"
+        help="ignored"
     )
     args = ap.parse_args()
 
