@@ -51,20 +51,25 @@ def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
 class Controller(object):
     def __init__(self, path):
         self._brightness_path = os.path.join(path, "brightness")
-        self._max_brightness = int(
-            open(os.path.join(path, "max_brightness")).read())
+        with open(os.path.join(path, "max_brightness")) as maximum_brightness_file:
+            self._max_brightness = int(maximum_brightness_file.read())
 
     def raw_brightness(self):
-        return int(open(self._brightness_path).read())
+        raw_brightness = 0
+        with open(self._brightness_path) as brightness_file:
+            raw_brightness = int(brightness_file.read())
+
+        return raw_brightness
 
     def brightness(self):
         return self.raw_brightness() * 100 / self._max_brightness
 
-    def set_raw_brightness(self, b):
-        open(self._brightness_path, "w").write(str(int(round(b))))
+    def set_raw_brightness(self, new_value):
+        with open(self._brightness_path, 'w') as brightness_file:
+            brightness_file.write('{0:.0f}'.format(new_value))
 
-    def set_brightness(self, pc):
-        self.set_raw_brightness(pc * self._max_brightness / 100)
+    def set_brightness(self, percent):
+        self.set_raw_brightness(percent * self._max_brightness / 100)
 
 
 def sweep_brightness(ctrl, current, target, steps, delay):
