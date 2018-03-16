@@ -95,7 +95,20 @@ def _display_controllers(arguments):
     sys.exit(0)
 
 
+def _make_controller():
+    controllers = get_controllers()
+
+    def _wrapper(controller_name):
+        if controller_name not in controllers.values():
+            error("unknown controller '{}'".format(controller_name))
+            sys.exit(1)
+        return Controller(controllers[controller_name])
+
+    return _wrapper
+
+
 def main():
+    controllers = tuple(get_controllers().values())
     ap = argparse.ArgumentParser(description=APP_DESC, add_help=False)
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("-h", "-help", action="help",
@@ -111,7 +124,12 @@ def main():
                    help="Decrease brightness")
     g.add_argument("pc", metavar="PERCENT", type=pc, nargs='?',
                    help="[=+-]PERCENT to set, increase, decrease brightness")
-    ap.add_argument("-ctrl", help="Set controller to use")
+    ap.add_argument(
+        "-ctrl",
+        default=Controller(controllers[0]),
+        type=_make_controller(),
+        help="set the controller to use"
+    )
     ap.add_argument("-time", metavar="MILLISECS", type=int,
                     default=200, help="Fading period (in milliseconds, default: 200)")
     g = ap.add_mutually_exclusive_group()
@@ -124,16 +142,7 @@ def main():
 
     if args.command is not None:
         args.command(args)
-    ctrls = get_controllers()
-
-    # set current operating controller
-    if args.ctrl is None:
-        ctrl = Controller(next(iter(ctrls.values())))
-    else:
-        if args.ctrl not in ctrls:
-            error("unknown controller '{}'".format(args.ctrl))
-            return 1
-        ctrl = Controller(ctrls[args.ctrl])
+    ctrl = args.ctrl
 
     # uniform set arguments
     if args.pc is not None:
