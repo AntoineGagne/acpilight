@@ -105,11 +105,11 @@ def _make_controller(controller_name):
 
 
 def _display_brightness(arguments):
-    print(int(round(arguments.ctrl.brightness())))
+    print('{0:.0f}'.format(arguments.ctrl.brightness()))
 
 
 def _display_fractional_brightness(arguments):
-    print(arguments.ctrl.brightness())
+    print('{0:.2f}'.format(arguments.ctrl.brightness()))
 
 
 def _handle_other_actions(arguments):
