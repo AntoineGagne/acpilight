@@ -6,7 +6,10 @@ from typing import List
 CONTROLLERS_PATH: List[str] = ["/sys/class/backlight", "/sys/class/leds"]
 
 #: The name of the file that contains the maximum brightness value
-MAX_BRIGHTNESS_FILE: str = "max_brightness"
+MAXIMUM_BRIGHTNESS_FILE: str = "max_brightness"
 
 #: The name of the file that contains the brightness value
 BRIGHTNESS_FILE: str = "brightness"
+
+#: The minimum brightness value that a controller can take
+MINIMUM_BRIGHTNESS_VALUE: int = 0

@@ -5,15 +5,22 @@
 """
 
 import argparse
+import contextlib
 import os
 import sys
 import time
 
 from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
-from typing import TypeVar
+from math import trunc
+from typing import TypeVar, Optional, IO, AnyStr
 
-from acpilight.constants import CONTROLLERS_PATH, BRIGHTNESS_FILE, MAX_BRIGHTNESS_FILE
+from acpilight.constants import (
+    CONTROLLERS_PATH,
+    BRIGHTNESS_FILE,
+    MAXIMUM_BRIGHTNESS_FILE,
+    MINIMUM_BRIGHTNESS_VALUE
+)
 
 T = TypeVar('T')
 
@@ -48,36 +55,40 @@ def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
     return max(min(value, maximum_value), minimum_value)
 
 
-class Controller(object):
-    def __init__(self, path):
-        self._brightness_path = os.path.join(path, BRIGHTNESS_FILE)
-        with open(os.path.join(path, MAX_BRIGHTNESS_FILE)) as maximum_brightness_file:
-            self._max_brightness = int(maximum_brightness_file.read())
+class Controller:
+    def __init__(self, brightness_file: IO[AnyStr], maximum_brightness_file: IO[AnyStr]) -> None:
+        self._brightness_file: IO = brightness_file
+        self._max_brightness: int = int(maximum_brightness_file.read())
 
-    def raw_brightness(self):
-        with open(self._brightness_path) as brightness_file:
-            raw_brightness = int(brightness_file.read())
+    @property
+    def raw_brightness(self) -> int:
+        return int(self._brightness_file.read())
 
-        return raw_brightness
+    @property
+    def brightness(self) -> float:
+        return self.raw_brightness * 100 / self._max_brightness
 
-    def brightness(self):
-        return self.raw_brightness() * 100 / self._max_brightness
+    @raw_brightness.setter
+    def raw_brightness(self, new_value: int):
+        new_value = normalize(
+            new_value,
+            MINIMUM_BRIGHTNESS_VALUE,
+            self._max_brightness
+        )
+        self._brightness_file.write(str(new_value))
 
-    def set_raw_brightness(self, new_value):
-        with open(self._brightness_path, 'w') as brightness_file:
-            brightness_file.write('{0:.0f}'.format(new_value))
-
-    def set_brightness(self, percent):
-        self.set_raw_brightness(percent * self._max_brightness / 100)
+    @brightness.setter
+    def brightness(self, percent: int):
+        self.raw_brightness = trunc(percent * self._max_brightness / 100)
 
 
 def sweep_brightness(ctrl, current, target, steps, delay):
     sleep = (delay / 1000.) / steps
     for s in range(1, steps):
         pc = current + (target - current) * s / steps
-        ctrl.set_brightness(pc)
+        ctrl.brightness = pc
         time.sleep(sleep)
-    ctrl.set_brightness(target)
+    ctrl.brightness = target
 
 
 def pc(arg):
@@ -98,14 +109,22 @@ def _display_controllers(arguments):
         print(controller)
 
 
-def _make_controller(controller_name):
+def _make_controller(controller_name: Optional[str]) -> Controller:
     controllers = get_controllers()
 
-    if controller_name not in controllers.values():
+    if controller_name is not None and controller_name not in controllers.values():
         error("unknown controller '{}'".format(controller_name))
         sys.exit(1)
 
-    return Controller(controllers[controller_name])
+    controller = controllers.get(controller_name, tuple(controllers.values())[0])
+    with contextlib.ExitStack() as context_stack:
+        maximum_brightness_file = context_stack.enter_context(
+            open(os.path.join(controller, MAXIMUM_BRIGHTNESS_FILE), 'r')
+        )
+        brightness_file = context_stack.enter_context(
+            open(os.path.join(controller, BRIGHTNESS_FILE), 'w+')
+        )
+        return Controller(brightness_file, maximum_brightness_file)
 
 
 def _display_brightness(arguments):
@@ -140,7 +159,7 @@ def _handle_other_actions(arguments):
     if current == target:
         pass
     elif arguments.steps <= 1 or arguments.time < 1:
-        arguments.ctrl.set_brightness(target)
+        arguments.ctrl.brightness = target
     else:
         sweep_brightness(
             arguments.ctrl,
@@ -152,7 +171,6 @@ def _handle_other_actions(arguments):
 
 
 def main():
-    controllers = tuple(get_controllers().values())
     parser = argparse.ArgumentParser(
         description='Control backlight brightness',
         formatter_class=ArgumentDefaultsHelpFormatter
@@ -205,7 +223,7 @@ def main():
         help="[=+-]PERCENT to set, increase, decrease brightness")
     parser.add_argument(
         "-ctrl",
-        default=Controller(controllers[0]),
+        default=_make_controller(None),
         type=_make_controller,
         help="set the controller to use"
     )
