@@ -11,14 +11,9 @@ import time
 
 from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
-from typing import TypeVar, List
+from typing import TypeVar
 
-#: The paths where the backlight controllers can be found
-CONTROLLERS_PATH: List[str] = ["/sys/class/backlight", "/sys/class/leds"]
-#: The name of the file that contains the maximum brightness value
-MAX_BRIGHTNESS_FILE: str = "max_brightness"
-#: The name of the file that contains the brightness value
-BRIGHTNESS_FILE: str = "brightness"
+from acpilight.constants import CONTROLLERS_PATH, BRIGHTNESS_FILE, MAX_BRIGHTNESS_FILE
 
 T = TypeVar('T')
 
@@ -60,7 +55,6 @@ class Controller(object):
             self._max_brightness = int(maximum_brightness_file.read())
 
     def raw_brightness(self):
-        raw_brightness = 0
         with open(self._brightness_path) as brightness_file:
             raw_brightness = int(brightness_file.read())
 
