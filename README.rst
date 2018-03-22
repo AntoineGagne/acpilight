@@ -21,20 +21,23 @@ ACPI interface to set the display brightness. On modern laptops "acpilight" can
 control both display and keyboard backlight uniformly on either X11, the
 console or Wayland.
 
-Motivation
-==========
+Requirements
+============
 
-On some modern laptops "XRandR" might lack the ability to set the display
-brightness. This capability was moved/unified to the kernel's ACPI interface,
-via ``/sys/class/backlight/``.
+To install this program, you must have a version of ``python`` higher or equal
+to 3.6. Also, you must be on Linux.
 
-"acpilight" provides a drop-in replacement for the ``xbacklight`` command that
-uses the ACPI interface instead of "XRandR", allowing old scripts to run. As a
-result, ``xbacklight`` can subsequently be used also from the console and
-Wayland (X11 is not used at all).
+Installation
+============
 
-When paired with the ddcci-backlight_ kernel module, the backlight of most
-professional external monitors can be controlled as well.
+Since this program uses ``setuptools``, you can use the following command to
+install it:
+
+.. code-block:: sh
+
+    python setup.py install --user
+
+This will install the package in your user site-packages.
 
 Setup
 =====
@@ -78,6 +81,21 @@ backlight control can be enabled by installing the `appropriate drivers
 <ddcci-backlight_>`_ and loading the ``ddcci-backlight`` module at boot
 time. On Debian, this is done by installing the ``ddcci-dkms`` package
 and then appending ``ddcci-backlight`` to ``/etc/modules``.
+
+Motivation
+==========
+
+On some modern laptops "XRandR" might lack the ability to set the display
+brightness. This capability was moved/unified to the kernel's ACPI interface,
+via ``/sys/class/backlight/``.
+
+"acpilight" provides a drop-in replacement for the ``xbacklight`` command that
+uses the ACPI interface instead of "XRandR", allowing old scripts to run. As a
+result, ``xbacklight`` can subsequently be used also from the console and
+Wayland (X11 is not used at all).
+
+When paired with the ddcci-backlight_ kernel module, the backlight of most
+professional external monitors can be controlled as well.
 
 Differences from xbacklight
 ===========================
