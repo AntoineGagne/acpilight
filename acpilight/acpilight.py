@@ -75,6 +75,7 @@ class Controller:
     >>> max_brightness_file = StringIO('100')
     >>> controller = Controller(brightness_file, max_brightness_file)
     >>> controller.raw_brightness = 15
+    >>> controller.raw_brightness
     15
     """
 
@@ -85,7 +86,10 @@ class Controller:
     @property
     def raw_brightness(self) -> int:
         """The current brightness value as an integer."""
-        return int(self._brightness_file.read())
+        raw_brightness = int(self._brightness_file.read())
+        self._brightness_file.seek(0)
+
+        return raw_brightness
 
     @property
     def brightness(self) -> float:
@@ -99,21 +103,41 @@ class Controller:
             MINIMUM_BRIGHTNESS_VALUE,
             self._max_brightness
         )
-        print(new_value)
         self._brightness_file.write(str(new_value))
+        self._brightness_file.seek(0)
 
     @brightness.setter
     def brightness(self, percent: int):
         self.raw_brightness = trunc(percent * self._max_brightness / 100)
 
 
-def sweep_brightness(ctrl, current, target, steps, delay):
+def sweep_brightness(controller, target, steps, delay):
+    """Gradually increase brightness by regular steps over a certain delay up to a certain brightness.
+
+    :param controller: The control that control the brightness
+    :param target: The target brightness value
+    :param steps: The amount of steps to do before reaching the target's brightness value
+    :param delay: The amount of time that the operation must take
+    """
     sleep = (delay / 1000.) / steps
-    for s in range(1, steps):
-        pc = current + (target - current) * s / steps
-        ctrl.brightness = pc
+    for value in generate_brightness_steps(controller, target, steps):
+        controller.brightness = value
         time.sleep(sleep)
-    ctrl.brightness = target
+
+
+def generate_brightness_steps(controller, target, steps):
+    """Generate all the accurate steps to get the controller's current brightness to the target.
+
+    :param controller: The control that control the brightness
+    :param target: The target brightness value
+    :param steps: The amount of steps to do before reaching the target's brightness value
+    :returns: All the steps to be done to reach the target's brightness value
+    """
+    current = controller.brightness
+    for step in range(1, steps):
+        yield current + (target - current) * step / steps
+
+    yield target
 
 
 def pc(arg):
@@ -173,23 +197,20 @@ def _handle_other_actions(arguments):
     if arguments.fps:
         arguments.steps = int((arguments.fps / 1000) * arguments.time)
 
-    # perform the requested action
-    current = arguments.ctrl.brightness()
     if arguments.set is not None:
         target = arguments.set
     elif arguments.inc is not None:
-        target = current + arguments.inc
+        target = arguments.ctrl.brightness + arguments.inc
     elif arguments.dec is not None:
-        target = current - arguments.dec
+        target = arguments.ctrl.brightness - arguments.dec
     target = normalize(target, 0, 100)
-    if current == target:
+    if arguments.ctrl.brightness == target:
         pass
     elif arguments.steps <= 1 or arguments.time < 1:
         arguments.ctrl.brightness = target
     else:
         sweep_brightness(
             arguments.ctrl,
-            current,
             target,
             arguments.steps,
             arguments.time
