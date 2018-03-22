@@ -7,7 +7,6 @@ from collections import OrderedDict
 from math import trunc
 from typing import IO, AnyStr, MutableMapping, Optional
 
-from acpilight.acpilight import error
 from acpilight.constants import MINIMUM_BRIGHTNESS_VALUE, CONTROLLERS_PATH, MAXIMUM_BRIGHTNESS_FILE, BRIGHTNESS_FILE
 from acpilight.utils import normalize
 
@@ -104,10 +103,19 @@ def get_controllers() -> MutableMapping[str, str]:
 
 
 def make_controller(controller_name: Optional[str]) -> Controller:
+    """Make the given controller if it exists.
+
+    :param controller_name: The name of the controller to create
+    :returns: The created controller
+    """
     controllers = get_controllers()
 
     if controller_name is not None and controller_name not in controllers.values():
-        error("unknown controller '{}'".format(controller_name))
+        print(
+            f"{controller_name} is not amongst the valid controllers. Please "
+            "specify a valid name.",
+            file=sys.stderr
+        )
         sys.exit(1)
 
     controller = controllers.get(controller_name, tuple(controllers.values())[0])

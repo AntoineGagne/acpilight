@@ -41,7 +41,7 @@ if __name__ == '__main__':
         license='GPL 3.0 License',
         zip_safe=False,
         platforms='linux',
-        python_requires='>=2.7',
+        python_requires='>=3.6',
         packages=find_packages(
             exclude=[
                 'tests'

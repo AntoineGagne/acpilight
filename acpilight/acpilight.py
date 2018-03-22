@@ -5,7 +5,6 @@
 """
 
 import argparse
-import sys
 
 from argparse import ArgumentDefaultsHelpFormatter
 
@@ -13,12 +12,11 @@ from acpilight.brightness import sweep_brightness, get_controllers, make_control
 from acpilight.utils import normalize
 
 
-def error(msg):
-    print(sys.argv[0] + ": " + msg)
+VALID_PERCENT_ARGUMENT_BEGINNING = frozenset('=+-0123456789')
 
 
 def percent(arg):
-    if len(arg) == 0 or arg[0] not in '=+-0123456789':
+    if len(arg) == 0 or arg[0] not in VALID_PERCENT_ARGUMENT_BEGINNING:
         return None
     if arg[0] not in '=+-':
         arg = '=' + arg
@@ -36,11 +34,11 @@ def _display_controllers(arguments):
 
 
 def _display_brightness(arguments):
-    print('{0:.0f}'.format(arguments.ctrl.brightness))
+    print(f'{arguments.ctrl.brightness:.0f}')
 
 
 def _display_fractional_brightness(arguments):
-    print('{0:.2f}'.format(arguments.ctrl.brightness))
+    print(f'{arguments.ctrl.brightness:.2f}')
 
 
 def _handle_other_actions(arguments):
