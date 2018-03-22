@@ -5,7 +5,6 @@
 """
 
 import argparse
-import contextlib
 import os
 import sys
 import time
@@ -13,7 +12,7 @@ import time
 from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
 from math import trunc
-from typing import TypeVar, Optional, IO, AnyStr
+from typing import TypeVar, Optional, IO, AnyStr, MutableMapping
 
 from acpilight.constants import (
     CONTROLLERS_PATH,
@@ -29,17 +28,26 @@ def error(msg):
     print(sys.argv[0] + ": " + msg)
 
 
-def get_controllers():
-    ctrls = OrderedDict()
+def get_controllers() -> MutableMapping[str, str]:
+    """Get all the controllers from the path given by the constants ``CONTROLLERS_PATH``.
+
+    :returns: An :class:`collections.OrderedDict` that contains the controllers'
+              name as the keys and their paths as values
+    """
+    controllers_path_by_controllers_name = OrderedDict()
     for path in CONTROLLERS_PATH:
         for name in os.listdir(path):
-            ctrls[name] = os.path.join(path, name)
-    return ctrls
+            controllers_path_by_controllers_name[name] = os.path.join(path, name)
+
+    return controllers_path_by_controllers_name
 
 
 def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
-    """Normalize a value so that it doesn't exceed a given range. Supports all
-       ordered types.
+    """Normalize a value so that it doesn't exceed a given range.
+
+    .. note::
+
+        Supports all ordered types.
 
     :param value: The value to normalize
     :param minimum_value: The minimum value that ``value`` can take
@@ -69,6 +77,7 @@ class Controller:
     >>> controller.raw_brightness = 15
     15
     """
+
     def __init__(self, brightness_file: IO[AnyStr], maximum_brightness_file: IO[AnyStr]) -> None:
         self._brightness_file: IO = brightness_file
         self._max_brightness: int = int(maximum_brightness_file.read())
