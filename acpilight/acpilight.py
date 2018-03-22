@@ -11,9 +11,14 @@ import time
 
 from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
-from typing import TypeVar
+from typing import TypeVar, List
 
-CONTROLLERS_PATH = ["/sys/class/backlight", "/sys/class/leds"]
+#: The paths where the backlight controllers can be found
+CONTROLLERS_PATH: List[str] = ["/sys/class/backlight", "/sys/class/leds"]
+#: The name of the file that contains the maximum brightness value
+MAX_BRIGHTNESS_FILE: str = "max_brightness"
+#: The name of the file that contains the brightness value
+BRIGHTNESS_FILE: str = "brightness"
 
 T = TypeVar('T')
 
@@ -50,8 +55,8 @@ def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
 
 class Controller(object):
     def __init__(self, path):
-        self._brightness_path = os.path.join(path, "brightness")
-        with open(os.path.join(path, "max_brightness")) as maximum_brightness_file:
+        self._brightness_path = os.path.join(path, BRIGHTNESS_FILE)
+        with open(os.path.join(path, MAX_BRIGHTNESS_FILE)) as maximum_brightness_file:
             self._max_brightness = int(maximum_brightness_file.read())
 
     def raw_brightness(self):
