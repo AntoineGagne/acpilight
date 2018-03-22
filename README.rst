@@ -1,6 +1,10 @@
-========================================================
-acpilight: a backward-compatibile xbacklight replacement
-========================================================
+=========
+acpilight
+=========
+------------------------------------------------
+A Backward-Compatible ``xbacklight`` Replacement
+------------------------------------------------
+
 
 :Author:
     `Yuri D'Elia <wavexx@thregr.org>`_
