@@ -4,14 +4,7 @@ from unittest import mock
 from hypothesis import given
 from hypothesis.strategies import integers
 
-from acpilight.acpilight import normalize, Controller, generate_brightness_steps
-
-
-@given(integers())
-def test_that_given_a_number_when_normalizing_then_respects_normalization_range(value: int):
-    new_value = normalize(value, 0, 100)
-
-    assert 0 <= new_value <= 100
+from acpilight.acpilight import Controller, generate_brightness_steps
 
 
 @given(integers(), integers(min_value=0))

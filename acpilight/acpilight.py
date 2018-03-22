@@ -12,7 +12,7 @@ import time
 from argparse import ArgumentDefaultsHelpFormatter
 from collections import OrderedDict
 from math import trunc
-from typing import TypeVar, Optional, IO, AnyStr, MutableMapping
+from typing import Optional, IO, AnyStr, MutableMapping
 
 from acpilight.constants import (
     CONTROLLERS_PATH,
@@ -20,8 +20,7 @@ from acpilight.constants import (
     MAXIMUM_BRIGHTNESS_FILE,
     MINIMUM_BRIGHTNESS_VALUE
 )
-
-T = TypeVar('T')
+from acpilight.utils import normalize
 
 
 def error(msg):
@@ -40,27 +39,6 @@ def get_controllers() -> MutableMapping[str, str]:
             controllers_path_by_controllers_name[name] = os.path.join(path, name)
 
     return controllers_path_by_controllers_name
-
-
-def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
-    """Normalize a value so that it doesn't exceed a given range.
-
-    .. note::
-
-        Supports all ordered types.
-
-    :param value: The value to normalize
-    :param minimum_value: The minimum value that ``value`` can take
-    :param maximum_value: The maximum value that ``value`` can take
-    :returns: If the value is between the minimum and maximum value, then
-              returns the value. Otherwise, returns one of the bounds.
-
-    :Example:
-
-    >>> normalize(-5, 0, 100)
-    0
-    """
-    return max(min(value, maximum_value), minimum_value)
 
 
 class Controller:
@@ -140,7 +118,7 @@ def generate_brightness_steps(controller, target, steps):
     yield target
 
 
-def pc(arg):
+def percent(arg):
     if len(arg) == 0 or arg[0] not in '=+-0123456789':
         return None
     if arg[0] not in '=+-':
@@ -265,7 +243,7 @@ def main():
     group.add_argument(
         "pc",
         metavar="PERCENT",
-        type=pc,
+        type=percent,
         nargs='?',
         help="[=+-]PERCENT to set, increase, decrease brightness")
     parser.add_argument(
