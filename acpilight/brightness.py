@@ -7,7 +7,12 @@ from collections import OrderedDict
 from math import trunc
 from typing import IO, AnyStr, MutableMapping, Optional
 
-from acpilight.constants import MINIMUM_BRIGHTNESS_VALUE, CONTROLLERS_PATH, MAXIMUM_BRIGHTNESS_FILE, BRIGHTNESS_FILE
+from acpilight.constants import (
+    MINIMUM_BRIGHTNESS_VALUE,
+    CONTROLLERS_PATH,
+    MAXIMUM_BRIGHTNESS_FILE,
+    BRIGHTNESS_FILE
+)
 from acpilight.utils import normalize
 
 
@@ -27,7 +32,8 @@ def generate_brightness_steps(controller, target, steps):
 
 
 def sweep_brightness(controller, target, steps, delay):
-    """Gradually increase brightness by regular steps over a certain delay up to a certain brightness.
+    """Gradually increase brightness by regular steps over a certain delay up to a certain
+       brightness.
 
     :param controller: The control that control the brightness
     :param target: The target brightness value
@@ -43,7 +49,8 @@ def sweep_brightness(controller, target, steps, delay):
 class Controller:
     """Controls the brightness of a specific device.
 
-    It controls the brightness of a specific device by writing to its corresponding ``brightness`` file.
+    It controls the brightness of a specific device by writing to its corresponding ``brightness``
+    file.
 
     :Example:
 
@@ -94,12 +101,12 @@ def get_controllers() -> MutableMapping[str, str]:
     :returns: An :class:`collections.OrderedDict` that contains the controllers'
               name as the keys and their paths as values
     """
-    controllers_path_by_controllers_name = OrderedDict()
+    controllers_path_by_controllers = OrderedDict()
     for path in CONTROLLERS_PATH:
         for name in os.listdir(path):
-            controllers_path_by_controllers_name[name] = os.path.join(path, name)
+            controllers_path_by_controllers[name] = os.path.join(path, name)
 
-    return controllers_path_by_controllers_name
+    return controllers_path_by_controllers
 
 
 def make_controller(controller_name: Optional[str]) -> Controller:

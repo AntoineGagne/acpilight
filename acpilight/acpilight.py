@@ -15,8 +15,8 @@ from acpilight.utils import normalize
 VALID_PERCENT_ARGUMENT_BEGINNING = frozenset('=+-0123456789')
 
 
-def percent(arg):
-    if len(arg) == 0 or arg[0] not in VALID_PERCENT_ARGUMENT_BEGINNING:
+def _percent(arg):
+    if arg or arg[0] not in VALID_PERCENT_ARGUMENT_BEGINNING:
         return None
     if arg[0] not in '=+-':
         arg = '=' + arg
@@ -27,7 +27,7 @@ def percent(arg):
     return arg
 
 
-def _display_controllers(arguments):
+def _display_controllers(_):
     controllers = get_controllers()
     for controller in controllers:
         print(controller)
@@ -43,13 +43,13 @@ def _display_fractional_brightness(arguments):
 
 def _handle_other_actions(arguments):
     if arguments.pc is not None:
-        v = float(arguments.pc[1:])
+        value = float(arguments.pc[1:])
         if arguments.pc[0] == '=':
-            arguments.set = v
+            arguments.set = value
         elif arguments.pc[0] == '+':
-            arguments.inc = v
+            arguments.inc = value
         elif arguments.pc[0] == '-':
-            arguments.dec = v
+            arguments.dec = value
     if arguments.fps:
         arguments.steps = int((arguments.fps / 1000) * arguments.time)
 
@@ -74,6 +74,7 @@ def _handle_other_actions(arguments):
 
 
 def main():
+    """Launch the program with the parsed arguments from stdin."""
     parser = argparse.ArgumentParser(
         description='Control backlight brightness',
         formatter_class=ArgumentDefaultsHelpFormatter
@@ -121,7 +122,7 @@ def main():
     group.add_argument(
         "pc",
         metavar="PERCENT",
-        type=percent,
+        type=_percent,
         nargs='?',
         help="[=+-]PERCENT to set, increase, decrease brightness")
     parser.add_argument(
