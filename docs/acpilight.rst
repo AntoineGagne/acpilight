@@ -13,6 +13,24 @@ acpilight.acpilight module
     :show-inheritance:
 
 
+acpilight.brightness module
+---------------------------
+
+.. automodule:: acpilight.brightness
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+acpilight.utils module
+----------------------
+
+.. automodule:: acpilight.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Module contents
 ---------------
 
