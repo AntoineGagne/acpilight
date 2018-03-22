@@ -1,3 +1,5 @@
+"""Contains utilities functions."""
+
 from typing import TypeVar
 
 
