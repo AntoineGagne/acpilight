@@ -56,17 +56,32 @@ def normalize(value: T, minimum_value: T, maximum_value: T) -> T:
 
 
 class Controller:
+    """Controls the brightness of a specific device.
+
+    It controls the brightness of a specific device by writing to its corresponding ``brightness`` file.
+
+    :Example:
+
+    >>> from io import StringIO
+    >>> brightness_file = StringIO('5')
+    >>> max_brightness_file = StringIO('100')
+    >>> controller = Controller(brightness_file, max_brightness_file)
+    >>> controller.raw_brightness = 15
+    15
+    """
     def __init__(self, brightness_file: IO[AnyStr], maximum_brightness_file: IO[AnyStr]) -> None:
         self._brightness_file: IO = brightness_file
         self._max_brightness: int = int(maximum_brightness_file.read())
 
     @property
     def raw_brightness(self) -> int:
+        """The current brightness value as an integer."""
         return int(self._brightness_file.read())
 
     @property
     def brightness(self) -> float:
-        return self.raw_brightness * 100 / self._max_brightness
+        """The current brightness in percentage."""
+        return self.raw_brightness / self._max_brightness * 100
 
     @raw_brightness.setter
     def raw_brightness(self, new_value: int):
@@ -75,6 +90,7 @@ class Controller:
             MINIMUM_BRIGHTNESS_VALUE,
             self._max_brightness
         )
+        print(new_value)
         self._brightness_file.write(str(new_value))
 
     @brightness.setter
@@ -117,22 +133,23 @@ def _make_controller(controller_name: Optional[str]) -> Controller:
         sys.exit(1)
 
     controller = controllers.get(controller_name, tuple(controllers.values())[0])
-    with contextlib.ExitStack() as context_stack:
-        maximum_brightness_file = context_stack.enter_context(
-            open(os.path.join(controller, MAXIMUM_BRIGHTNESS_FILE), 'r')
-        )
-        brightness_file = context_stack.enter_context(
-            open(os.path.join(controller, BRIGHTNESS_FILE), 'w+')
-        )
-        return Controller(brightness_file, maximum_brightness_file)
+    maximum_brightness_file = open(
+        os.path.join(controller, MAXIMUM_BRIGHTNESS_FILE),
+        'r'
+    )
+    brightness_file = open(
+        os.path.join(controller, BRIGHTNESS_FILE),
+        'w+'
+    )
+    return Controller(brightness_file, maximum_brightness_file)
 
 
 def _display_brightness(arguments):
-    print('{0:.0f}'.format(arguments.ctrl.brightness()))
+    print('{0:.0f}'.format(arguments.ctrl.brightness))
 
 
 def _display_fractional_brightness(arguments):
-    print('{0:.2f}'.format(arguments.ctrl.brightness()))
+    print('{0:.2f}'.format(arguments.ctrl.brightness))
 
 
 def _handle_other_actions(arguments):
