@@ -5,6 +5,8 @@ acpilight
 A Backward-Compatible ``xbacklight`` Replacement
 ------------------------------------------------
 
+.. image:: https://travis-ci.org/AntoineGagne/acpilight.svg?branch=master
+    :target: https://travis-ci.org/AntoineGagne/acpilight
 
 :Author:
     `Yuri D'Elia <wavexx@thregr.org>`_
