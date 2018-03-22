@@ -1,0 +1,25 @@
+sudo: false
+language: python
+
+matrix:
+    include:
+        - python: 3.6
+          env: TOXENV=py36
+
+install:
+    - pip install tox
+
+script:
+    - tox
+    - tox -e flake
+    - tox -e pylint
+
+cache:
+    - pip
+
+branches:
+    only:
+        - master
+
+notifications:
+    email: false
