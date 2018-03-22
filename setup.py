@@ -69,7 +69,8 @@ if __name__ == '__main__':
         classifiers=[
             'Development Status :: 3 - Pre-Alpha',
             'Operating System :: Linux',
-            'Programming Language :: Python :: 2'
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.6'
         ],
         keywords=[
             'linux',
